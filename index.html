@@ -1,138 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="./manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mall Wayfinder</title>
+    <title>Grand Plaza Wayfinder</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="styles.css?v=m1w4y">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=z9x8c7">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <i class="fas fa-shopping-bag"></i> Grand Plaza Mall
-            </div>
-            <div class="datetime" id="datetime"></div>
-        </header>
+    <div class="app-background"></div>
 
+    <div class="app-container">
+        <!-- Main Content Area -->
         <div class="main-content">
             <!-- Sidebar / Directory -->
-            <aside class="sidebar">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="Search stores, food, services..." autocomplete="off">
-                    <button id="clearSearch" class="clear-btn hidden"><i class="fas fa-times"></i></button>
+            <aside class="sidebar glass-panel">
+                <header class="header">
+                    <div class="logo">
+                        <div class="logo-icon"><i class="fas fa-gem"></i></div>
+                        <div>
+                            <h1>Grand Plaza</h1>
+                            <span class="subtitle">Directory & Wayfinding</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="search-section">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Search stores, dining, services..." autocomplete="off">
+                        <button id="clearSearch" class="clear-btn hidden"><i class="fas fa-times-circle"></i></button>
+                    </div>
                 </div>
 
                 <div class="categories">
                     <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="anchor"><i class="fas fa-star"></i> Anchors</button>
                     <button class="category-btn" data-category="fashion"><i class="fas fa-tshirt"></i> Fashion</button>
-                    <button class="category-btn" data-category="food"><i class="fas fa-utensils"></i> Food</button>
+                    <button class="category-btn" data-category="food"><i class="fas fa-utensils"></i> Dining</button>
                     <button class="category-btn" data-category="electronics"><i class="fas fa-laptop"></i> Tech</button>
                     <button class="category-btn" data-category="services"><i class="fas fa-concierge-bell"></i> Services</button>
                 </div>
 
+                <div class="directory-header">
+                    <span id="resultCount">Showing all locations</span>
+                    <div class="sort-toggle"><i class="fas fa-sort-alpha-down"></i> A-Z</div>
+                </div>
+
                 <div class="directory-list" id="directoryList">
-                    <!-- Store items will be injected here -->
+                    <!-- Store items injected via JS -->
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="weather-widget">
+                        <i class="fas fa-sun"></i> 72°F Outside
+                    </div>
+                    <div class="datetime" id="datetime">--:--</div>
                 </div>
             </aside>
 
-            <!-- Map View -->
+            <!-- Map View Area -->
             <main class="map-container">
                 <div class="map-wrapper" id="mapWrapper">
-                    <svg id="mallMap" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="mallMap" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f0f0f0" stroke-width="1"/>
+                            <!-- Floor Grid Pattern -->
+                            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
                             </pattern>
-                            <filter id="shadow">
-                                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.1"/>
+                            <!-- Drop Shadows -->
+                            <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                                <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.15"/>
+                            </filter>
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="5" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
                             </filter>
                         </defs>
 
-                        <!-- Background Grid -->
-                        <rect width="1000" height="800" fill="url(#grid)" />
+                        <!-- Base Map Area -->
+                        <rect width="1200" height="900" fill="#e2e8f0" />
+                        <rect width="1200" height="900" fill="url(#grid)" />
 
-                        <!-- Mall Outline/Corridors -->
-                        <path d="M 100 100 L 900 100 L 900 700 L 100 700 Z" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
-                        <path d="M 250 100 L 250 700 M 750 100 L 750 700 M 100 400 L 900 400" stroke="#e9ecef" stroke-width="60" stroke-linecap="round"/>
+                        <!-- Mall Footprint (Corridors/Walking Areas) -->
+                        <path class="corridor" d="
+                            M 400 150 L 800 150 L 800 350 L 1000 350 L 1000 550 L 800 550 L 800 750 L 400 750 L 400 550 L 200 550 L 200 350 L 400 350 Z
+                        " fill="#f8fafc" stroke="#cbd5e1" stroke-width="4" filter="url(#shadow)"/>
+
+                        <!-- Center Atrium Detail -->
+                        <circle cx="600" cy="450" r="80" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="2"/>
+                        <circle cx="600" cy="450" r="40" fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="5 5"/>
+                        <text x="600" y="455" text-anchor="middle" font-family="Inter" font-size="14" fill="#94a3b8" font-weight="500" letter-spacing="2">MAIN ATRIUM</text>
 
                         <!-- Stores Group -->
                         <g id="storesGroup"></g>
 
-                        <!-- Route Path -->
-                        <path id="routePath" d="" fill="none" stroke="#00b7af" stroke-width="6" stroke-dasharray="10 10" class="route-animation hidden" />
+                        <!-- Route Layer -->
+                        <g id="routeLayer">
+                            <path id="routePathShadow" class="route-path shadow hidden" d="" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path id="routePath" class="route-path main hidden" d="" fill="none" stroke="var(--primary)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12 12"/>
+                        </g>
 
-                        <!-- You Are Here Marker -->
-                        <g id="kioskMarker" transform="translate(500, 400)">
-                            <circle cx="0" cy="0" r="15" fill="#10181f" filter="url(#shadow)"/>
-                            <circle cx="0" cy="0" r="6" fill="#fff"/>
-                            <text x="0" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#10181f">You Are Here</text>
+                        <!-- Start / Kiosk Marker -->
+                        <g id="kioskMarker" transform="translate(600, 480)">
+                            <circle cx="0" cy="0" r="24" fill="var(--dark)" opacity="0.1" filter="url(#glow)"/>
+                            <circle cx="0" cy="0" r="14" fill="var(--dark)" stroke="#fff" stroke-width="3"/>
+                            <circle cx="0" cy="0" r="4" fill="var(--primary)"/>
+                            <rect x="-45" y="20" width="90" height="26" rx="13" fill="var(--dark)" opacity="0.9"/>
+                            <text x="0" y="37" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#fff">YOU ARE HERE</text>
                         </g>
 
                         <!-- Destination Pin -->
-                        <g id="destPin" class="hidden">
-                            <path d="M0 -24 C -8 -24 -14 -18 -14 -10 C -14 -2 0 12 0 12 C 0 12 14 -2 14 -10 C 14 -18 8 -24 0 -24 Z" fill="#e74c3c" filter="url(#shadow)"/>
-                            <circle cx="0" cy="-10" r="4" fill="#fff"/>
+                        <g id="destPin" class="hidden destination-pin">
+                            <ellipse cx="0" cy="5" rx="12" ry="4" fill="#000" opacity="0.2"/>
+                            <path d="M 0 -35 C -12 -35 -20 -25 -20 -15 C -20 -2 0 10 0 10 C 0 10 20 -2 20 -15 C 20 -25 12 -35 0 -35 Z" fill="var(--danger)"/>
+                            <circle cx="0" cy="-18" r="8" fill="#fff"/>
+                            <i class="fas fa-star" style="font-size: 8px; color: var(--danger); position: absolute; top: -21px; left: -4px;"></i>
                         </g>
                     </svg>
 
-                    <!-- Map Controls -->
-                    <div class="map-controls">
-                        <button id="zoomIn"><i class="fas fa-plus"></i></button>
-                        <button id="zoomOut"><i class="fas fa-minus"></i></button>
-                        <button id="resetView"><i class="fas fa-compress-arrows-alt"></i></button>
-                    </div>
-                </div>
+                    <!-- Store Info Overlay Panel (Glassmorphism) -->
+                    <div class="store-info-panel glass-panel hidden" id="storeInfoPanel">
+                        <div class="panel-header">
+                            <button class="close-panel" id="closePanel"><i class="fas fa-times"></i></button>
+                            <div class="brand-header">
+                                <div class="store-logo-large" id="panelIcon"><i class="fas fa-store"></i></div>
+                                <div class="brand-titles">
+                                    <h2 id="panelName">Store Name</h2>
+                                    <span class="badge" id="panelCategoryBadge">Category</span>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- Store Info Panel -->
-                <div class="store-info-panel hidden" id="storeInfoPanel">
-                    <button class="close-panel" id="closePanel"><i class="fas fa-times"></i></button>
-                    <div class="store-header">
-                        <div class="store-icon" id="panelIcon"><i class="fas fa-store"></i></div>
-                        <div>
-                            <h2 id="panelName">Store Name</h2>
-                            <p id="panelCategory" class="text-muted">Category</p>
+                        <div class="panel-body">
+                            <p class="store-description" id="panelDesc">A premium lifestyle brand offering the latest in contemporary fashion and accessories.</p>
+
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt text-primary"></i>
+                                    <div>
+                                        <span class="info-label">Location</span>
+                                        <strong id="panelLocation">Level 1, North Wing</strong>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="far fa-clock text-primary"></i>
+                                    <div>
+                                        <span class="info-label">Hours</span>
+                                        <strong id="panelHours">10:00 AM - 9:00 PM</strong>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-phone-alt text-primary"></i>
+                                    <div>
+                                        <span class="info-label">Contact</span>
+                                        <strong id="panelPhone">(555) 123-4567</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-footer">
+                            <button class="action-btn primary-btn" id="navigateBtn">
+                                <i class="fas fa-location-arrow"></i> Take Me There
+                            </button>
+                            <button class="action-btn secondary-btn" id="sendPhoneBtn">
+                                <i class="fas fa-mobile-alt"></i> Send to Phone
+                            </button>
                         </div>
                     </div>
-                    <div class="store-details">
-                        <p><i class="fas fa-map-marker-alt"></i> Level 1, Unit <span id="panelUnit">101</span></p>
-                        <p><i class="far fa-clock"></i> 10:00 AM - 9:00 PM</p>
+
+                    <!-- Map Floating Controls -->
+                    <div class="map-controls glass-panel">
+                        <div class="control-group">
+                            <button class="control-btn" id="zoomIn" title="Zoom In"><i class="fas fa-plus"></i></button>
+                            <div class="divider"></div>
+                            <button class="control-btn" id="zoomOut" title="Zoom Out"><i class="fas fa-minus"></i></button>
+                        </div>
+                        <button class="control-btn" id="resetView" title="Reset Map"><i class="fas fa-crosshairs"></i></button>
                     </div>
-                    <button class="action-btn" id="navigateBtn">
-                        <i class="fas fa-directions"></i> Get Directions
-                    </button>
+
+                    <!-- Floor Selector (Visual only for now, adds complexity) -->
+                    <div class="floor-selector glass-panel">
+                        <button class="floor-btn">L3</button>
+                        <button class="floor-btn">L2</button>
+                        <button class="floor-btn active">L1</button>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Idle Overlay for Kiosk -->
+    <!-- Kiosk Idle/Screensaver Overlay -->
     <div class="idle-overlay hidden" id="idleOverlay">
+        <div class="idle-background"></div>
         <div class="idle-content">
-            <h1>Welcome to Grand Plaza</h1>
-            <p>Touch anywhere to start exploring</p>
-            <div class="touch-icon">
-                <i class="far fa-hand-pointer"></i>
+            <div class="idle-logo">
+                <i class="fas fa-gem"></i>
+                <h2>Grand Plaza</h2>
             </div>
+            <h1 class="welcome-text">Welcome.</h1>
+            <p class="instruction-text">Tap anywhere to find your way</p>
+            <div class="ripple-indicator">
+                <div class="ripple"></div>
+                <div class="ripple animation-delay-1"></div>
+                <i class="far fa-hand-pointer touch-icon"></i>
+            </div>
+        </div>
+        <div class="idle-footer">
+            <span>Mall Hours: 10:00 AM - 9:00 PM</span>
+            <span>•</span>
+            <span>Scan QR for mobile app</span>
         </div>
     </div>
 
-    <script src="script.js?v=m1w4y"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('./sw.js')
-          .then(function (reg) { console.log('[PWA] SW registered:', reg.scope); })
-          .catch(function (err) { console.warn('[PWA] SW registration failed:', err); });
-      });
-    }
-  </script>
+    <!-- Scripts -->
+    <script src="script.js?v=z9x8c7"></script>
+    <script>
+        // PWA disabled as per requirements, using empty script block to maintain structure if needed
+    </script>
 </body>
 </html>
